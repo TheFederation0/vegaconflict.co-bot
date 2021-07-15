@@ -1,0 +1,17 @@
+{
+  "name": "VC_Stats",
+  "description": "vegaconflict.co stats bot",
+  "version": "5.0.0",
+  "main": "bot.js",
+  "scripts": {
+    "start": "node bot.js"
+  },
+  "dependencies": {
+    "discord.js": "*",
+    "discordjs": "discordjs/Commando",
+    "prisma": "*",
+    "@prisma/client": "*",
+    "axios": "*",
+    "slash-create": "*"
+  }
+}

@@ -1,0 +1,134 @@
+"use strict";
+const { SlashCommand, CommandOptionType } = require('slash-create');
+const Discord = require('discord.js');
+const Package = require('../package.json');
+const request = require("request");
+
+module.exports = class statsCommand extends SlashCommand {
+    constructor(creator) {
+        super(creator, {
+            name: 'stats',
+            description: 'Displays player stats',
+            options: [{
+                type: CommandOptionType.INTEGER,
+                name: 'kixid',
+                description: 'Kixeye ID',
+                required: true
+            }]
+        });
+
+        // Not required initially, but required for reloading with a fresh file.
+        this.filePath = __filename;
+    }
+
+    async run(ctx) {
+
+                let body = await new Promise(function (resolve, rejected) {
+                    if(ctx.options.kixid.length < 5) return;
+                    request({
+                        method: 'GET',
+                        uri: 'https://api.vegaconflict.co/' + ctx.options.kixid,
+                        gzip: true,
+                        json: true
+                    }, function (error, response, body) {
+                        console.error('error:', error);
+                        if (response.statusCode !== 200 || body.status === '404' || body.status == null || typeof body.status == 'undefined') resolve(null);
+                        else {
+                            resolve(body);
+                        }
+                    });
+                });
+
+                if(body == null) return "Stats are not available for the specified ID"
+
+                let y = ["N/A", "N/A", "N/A"];
+
+
+    }
+}
+
+                body.baseAttackTotal = body.baseAttackWin + body.baseAttackLoss + body.baseAttackDraw;
+                body.baseDefenceTotal = body.baseDefenceWin + body.baseDefenceLoss + body.baseDefenceDraw;
+                body.fleetTotal = body.fleetWin + body.fleetLoss + body.fleetDraw;
+
+                y[0] = ((Number.parseInt(body.baseAttackWin, 10) / Number.parseInt(body.baseAttackTotal, 10))*10).toFixed(2);
+                y[1] = ((Number.parseInt(body.baseDefenceWin, 10) / Number.parseInt(body.baseDefenceTotal, 10))*10).toFixed(2);
+                y[2] = ((Number.parseInt(body.fleetWin, 10) / Number.parseInt(body.fleetTotal, 10))*10).toFixed(2);
+                body.baseAttackKd = (Number.parseInt(body.baseAttackWin, 10) / Number.parseInt(body.baseAttackLoss, 10)).toFixed(2);
+                body.baseDefenceKd = (Number.parseInt(body.baseDefenceWin, 10) / Number.parseInt(body.baseDefenceLoss, 10)).toFixed(2);
+                body.fleetKd = (Number.parseInt(body.fleetWin, 10) / Number.parseInt(body.fleetLoss, 10)).toFixed(2);
+
+                let res = 'https://i.ibb.co/hZ6p6wg/no-history.png';
+
+                return JSON.parse(`{
+                                          "embeds": [
+                                            {
+                                              "title": "` + body.alias + `",
+                                              "url": "https://vegaconflict.co/stats/player/` + body.userGameId + `",
+                                              "color": 7905779,
+                                              "footer": {
+                                                "text": "Bot build ` + Package.version + `"
+                                              },
+                                              "thumbnail": {
+                                                "url": "https://vegaconflict.co/img/VCIcon.png"
+                                              },
+                                              "image": {
+                                                "url": "` + res + `"
+                                              },
+                                              "fields": [
+                                                {
+                                                  "name": "\u200b",
+                                                  "value": "\u200b"
+                                                },
+                                                {
+                                                  "name": ":id: Player ID:",
+                                                  "value": "` + body.userGameId + `"
+                                                },
+                                                {
+                                                  "name": "Previous Names:",
+                                                  "value": "` + names +`"
+                                                },
+                                                {
+                                                  "name": ":beginner: Level:",
+                                                  "value": "`+ body.level +`",
+                                                  "inline": true
+                                                },
+                                                {
+                                                  "name": ":trophy: Medals:",
+                                                  "value": "` + body.medals + `",
+                                                  "inline": true
+                                                },
+                                                {
+                                                  "name": ":earth_americas: Planet:",
+                                                  "value": "` + body.planet + `",
+                                                  "inline": true
+                                                },
+                                                {
+                                                  "name": ":calendar_spiral: Playing Since:",
+                                                  "value": "` + body.since  +`",
+                                                  "inline": true
+                                                },
+                                                {
+                                                  "name": "Last Seen:",
+                                                  "value": "` + body.seen +`",
+                                                  "inline": true
+                                                },
+                                                {
+                                                  "name": ":bomb: Base Attack: `  + body.baseAttackTotal + `, ` + y[0] + `%, ` + body.baseAttackKd + `K/D",
+                                                  "value": "Wins  ` + body.baseAttackWin + `; Draw  ` + body.baseAttackDraw + `; Loss  ` + body.baseAttackLoss + `",
+                                                  "inline": false
+                                                },
+                                                {
+                                                  "name": ":shield: Base Defense: ` + body.baseDefenceTotal + `, ` + y[1] + `%, ` + body.baseDefenceKd + `K/D",
+                                                  "value": "Wins  ` + body.baseDefenceWin + `; Draw  ` + body.baseDefenceDraw + `; Loss  ` + body.baseDefenceLoss + `",
+                                                  "inline": false
+                                                },
+                                                {
+                                                  "name": ":crossed_swords: Fleet vs Fleet: ` + body.fleetTotal + `, ` + y[2] + `%, ` + body.fleetKd + `K/D",
+                                                  "value": "Wins  ` + body.fleetWin + `; Draw  ` + body.fleetDraw + `; Loss  ` + body.fleetLoss + `",
+                                                  "inline": false
+                                                }
+                                              ]
+                                            }
+                                          ]
+                                        }`);
