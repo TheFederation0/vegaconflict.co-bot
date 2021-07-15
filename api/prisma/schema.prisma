@@ -1,0 +1,23 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+datasource db {
+  provider = "mysql"
+  url      = "mysql://root:LYL99$GeU0m@localhost:3306/vcbot"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model players {
+  kxid      String   @id
+  alias     String
+  rank      Int
+  medals    Int?      @default(120000)
+  level     Int?      @default(0)
+  planet    String?   @default("000000")
+  uid       String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

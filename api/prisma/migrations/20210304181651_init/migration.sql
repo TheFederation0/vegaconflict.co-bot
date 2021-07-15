@@ -1,0 +1,5 @@
+-- AlterTable
+ALTER TABLE `players` MODIFY `medals` INTEGER DEFAULT 120000,
+    MODIFY `level` INTEGER DEFAULT 0,
+    MODIFY `planet` VARCHAR(191) DEFAULT '000000',
+    MODIFY `uid` VARCHAR(191);
